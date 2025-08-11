@@ -23,6 +23,10 @@ your day does not log time. Do not log time for daily or weekly assignments.
 Please enter values in whole minutes. 
 
 
+
+
 Feel free to message me with feedback!
+
 Email:   alexcsmaster212@gmail.com
+
 Discord: existence.111
