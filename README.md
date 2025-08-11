@@ -26,5 +26,4 @@ Please enter values in whole minutes.
 Feel free to message me with feedback!
 
 Email:   alexcsmaster212@gmail.com
-
 Discord: existence.111
