@@ -9,7 +9,7 @@ HTML file, and is supported by most web browsers. Functionality on mobile device
 data is stored locally.
 
 
-***To donwload, go to "index.html" on Github and select "Download raw file" on the top right. The HTML 
+***To download, go to "index.html" on Github and select "Download raw file" on the top right. The HTML 
 file should download to your device. Open it using your desired web browser.***
 
 
@@ -21,3 +21,8 @@ Logging time is necessary for the program to determine the relative importance o
 your day does not log time. Do not log time for daily or weekly assignments. 
 
 Please enter values in whole minutes. 
+
+
+Feel free to message me with feedback!
+Email:   alexcsmaster212@gmail.com
+Discord: existence.111
