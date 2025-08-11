@@ -4,8 +4,9 @@ This is a planner, specifically created for the purpose of managing dance homewo
 
 -----------------------------------------------------------------------------------------------------
 
-Download and open "index.html" locally using a web browser to access the program. All data is stored 
-locally; closing the tab doesn't reset the saved information.
+Download and open "index.html" locally using a web browser to access the program. "index.html" is an
+HTML file, and is supported by most web browsers. Functionality on mobile devices is un-tested. All 
+data is stored locally.
 
 There are 7 options within the website; follow on-screen instructions and enter appropriate 
 information. The program was not designed to automatically remove assignments past due date, and 
