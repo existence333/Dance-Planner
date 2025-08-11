@@ -8,10 +8,10 @@ Download and open "index.html" locally using a web browser to access the program
 HTML file, and is supported by most web browsers. Functionality on mobile devices is un-tested. All 
 data is stored locally.
 
-
+<br/>
 ***To download, go to "index.html" on Github and select "Download raw file" on the top right. The HTML 
 file should download to your device. Open it using your desired web browser.***
-
+<br/>
 
 There are 7 options within the website; follow on-screen instructions and enter appropriate 
 information. The program was not designed to automatically remove assignments past due date, and 
