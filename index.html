@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 700px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .nav-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn:active {
+            transform: translateY(0);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .date-input {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .assignments-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .assignment-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .assignment-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .assignment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .assignment-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .priority-1 { background: #28a745; }
+        .priority-2 { background: #17a2b8; }
+        .priority-3 { background: #ffc107; color: #333; }
+        .priority-4 { background: #fd7e14; }
+        .priority-5 { background: #dc3545; }
+
+        .assignment-details {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .edit-form-container {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+
+        .edit-form-header {
+            color: #495057;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                max-width: 95%;
+            }
+            
+            .nav-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .date-input {
+                grid-template-columns: 1fr;
+            }
+            
+            .assignment-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Time Manager</h1>
+        
+        <!-- Status Messages -->
+        <div id="status-message" class="status-message"></div>
+        
+        <!-- Main Menu -->
+        <div id="main-menu" class="section active">
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="showSection('add-assignment')">Add New Assignment</button>
+                <button class="nav-btn" onclick="showSection('plan-day')">Plan Day</button>
+                <button class="nav-btn" onclick="showSection('log-time')">Log Time</button>
+                <button class="nav-btn" onclick="showSection('view-assignments')">View Assignments</button>
+                <button class="nav-btn" onclick="showSection('edit-assignment')">Edit Assignment</button>
+                <button class="nav-btn" onclick="showSection('remove-assignment')">Remove Assignment</button>
+                <button class="nav-btn" onclick="showSection('backup-restore')">Backup & Restore</button>
+            </div>
+        </div>
+
+        <!-- Add Assignment Section -->
+        <div id="add-assignment" class="section">
+            <h2>Add New Assignment</h2>
+            <form id="add-assignment-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="teacher">Teacher:</label>
+                        <input type="text" id="teacher" name="teacher" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="type">Type:</label>
+                        <select id="type" name="type" onchange="toggleDateInput()">
+                            <option value="definite">Definite (has due date)</option>
+                            <option value="indefinite">Indefinite (no due date)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="task">Assignment:</label>
+                    <textarea id="task" name="task" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group" id="date-group">
+                    <label>Due Date:</label>
+                    <div class="date-input">
+                        <select id="dayOfWeek" name="dayOfWeek">
+                            <option value="Sun">Sunday</option>
+                            <option value="Mon">Monday</option>
+                            <option value="Tue">Tuesday</option>
+                            <option value="Wed">Wednesday</option>
+                            <option value="Thu">Thursday</option>
+                            <option value="Fri">Friday</option>
+                            <option value="Sat">Saturday</option>
+                        </select>
+                        <select id="month" name="month">
+                            <option value="Jan">January</option>
+                            <option value="Feb">February</option>
+                            <option value="Mar">March</option>
+                            <option value="Apr">April</option>
+                            <option value="May">May</option>
+                            <option value="Jun">June</option>
+                            <option value="Jul">July</option>
+                            <option value="Aug">August</option>
+                            <option value="Sep">September</option>
+                            <option value="Oct">October</option>
+                            <option value="Nov">November</option>
+                            <option value="Dec">December</option>
+                        </select>
+                        <input type="number" id="day" name="day" min="1" max="31" value="1">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="repetition">Repetition:</label>
+                        <select id="repetition" name="repetition">
+                            <option value="once">One-time</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="time">Estimated Time (minutes):</label>
+                        <input type="number" id="time" name="time" min="1" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="importance">Importance (1-5):</label>
+                    <select id="importance" name="importance">
+                        <option value="1">1 - Very Low Priority</option>
+                        <option value="2">2 - Low Priority</option>
+                        <option value="3">3 - Medium Priority</option>
+                        <option value="4">4 - High Priority</option>
+                        <option value="5">5 - Very High Priority</option>
+                    </select>
+                </div>
+                
+                <button type="button" class="back-btn" onclick="showSection('main-menu')">Back</button>
+                <button type="submit" class="submit-btn">Add Assignment</button>
+            </form>
+        </div>
+
+        <!-- View Assignments Section -->
+        <div id="view-assignments" class="section">
+            <h2>All Assignments</h2>
+            <div class="loading" id="assignments-loading">
+                <div class="spinner"></div>
+                <p>Loading assignments...</p>
+            </div>
+            <div id="assignments-container" class="assignments-list"></div>
+            <button type="button" class="back-btn" onclick="showSection('main-menu')">Back</button>
+            <button type="button" class="submit-btn" onclick="loadAssignments()">Refresh</button>
+        </div>
+
+        <!-- Plan Day Section -->
+        <div id="plan-day" class="section">
+            <h2>Plan Your Day</h2>
+            <div class="form-group">
+                <label for="available-time">Available Time Today (minutes):</label>
+                <input type="number" id="available-time" min="1" required>
+            </div>
+            <button type="button" class="back-btn" onclick="showSection('main-menu')">Back</button>
+            <button type="button" class="submit-btn" onclick="planDay()">Generate Plan</button>
+            <div id="plan-results" class="assignments-list" style="display: none;"></div>
+        </div>
+
+        <!-- Log Time Section -->
+        <div id="log-time" class="section">
+            <h2>Log Time</h2>
+            <p>Select an assignment and log the time you spent on it.</p>
+            <div class="form-group">
+                <label for="assignment-select">Assignment:</label>
+                <select id="assignment-select" required>
+                    <option value="">Select an assignment...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="time-spent">Time Spent (minutes):</label>
+                <input type="number" id="time-spent" min="1" required>
+            </div>
+            <button type="button" class="back-btn" onclick="showSection('main-menu')">Back</button>
+            <button type="button" class="submit-btn" onclick="logTime()">Log Time</button>
+        </div>
+
+        <!-- Edit Assignment Section -->
+        <div id="edit-assignment" class="section">
+            <h2>Edit Assignment</h2>
+            <div class="form-group">
+                <label for="edit-select">Select Assignment to Edit:</label>
+                <select id="edit-select" onchange="loadAssignmentForEdit()">
+                    <option value="">Select an assignment...</option>
+                </select>
+            </div>
+
+            <div id="edit-form-container" class="edit-form-container">
+                <h3 class="edit-form-header">Edit Assignment Details</h3>
+                <form id="edit-assignment-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-teacher">Teacher:</label>
+                            <input type="text" id="edit-teacher" name="teacher" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-type">Type:</label>
+                            <select id="edit-type" name="type" onchange="toggleEditDateInput()" required>
+                                <option value="definite">Definite (has due date)</option>
+                                <option value="indefinite">Indefinite (no due date)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-task">Assignment:</label>
+                        <textarea id="edit-task" name="task" rows="3" required></textarea>
+                    </div>
+
+                    <div id="edit-date-group" class="form-group">
+                        <label>Due Date:</label>
+                        <div class="date-input">
+                            <select id="edit-dayOfWeek" name="dayOfWeek">
+                                <option value="Sun">Sunday</option>
+                                <option value="Mon">Monday</option>
+                                <option value="Tue">Tuesday</option>
+                                <option value="Wed">Wednesday</option>
+                                <option value="Thu">Thursday</option>
+                                <option value="Fri">Friday</option>
+                                <option value="Sat">Saturday</option>
+                            </select>
+                            <select id="edit-month" name="month">
+                                <option value="Jan">January</option>
+                                <option value="Feb">February</option>
+                                <option value="Mar">March</option>
+                                <option value="Apr">April</option>
+                                <option value="May">May</option>
+                                <option value="Jun">June</option>
+                                <option value="Jul">July</option>
+                                <option value="Aug">August</option>
+                                <option value="Sep">September</option>
+                                <option value="Oct">October</option>
+                                <option value="Nov">November</option>
+                                <option value="Dec">December</option>
+                            </select>
+                            <input type="number" id="edit-day" name="day" min="1" max="31">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-repetition">Repetition:</label>
+                            <select id="edit-repetition" name="repetition" required>
+                                <option value="once">One-time</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-time">Estimated Time (minutes):</label>
+                            <input type="number" id="edit-time" name="time" min="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-importance">Importance (1-5):</label>
+                            <select id="edit-importance" name="importance" required>
+                                <option value="1">1 - Very Low Priority</option>
+                                <option value="2">2 - Low Priority</option>
+                                <option value="3">3 - Medium Priority</option>
+                                <option value="4">4 - High Priority</option>
+                                <option value="5">5 - Very High Priority</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-time-spent">Time Spent (minutes):</label>
+                            <input type="number" id="edit-time-spent" name="timeSpent" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="button" class="btn btn-success" onclick="saveEditedAssignment()">Save Changes</button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            
+            <button type="button" class="back-btn" onclick="showSection('main-menu')">Back</button>
+        </div>
+
+        <!-- Remove Assignment Section -->
+        <div id="remove-assignment" class="section">
+            <h2>Remove Assignment</h2>
+            <div class="form-group">
+                <label for="remove-select">Assignment to Remove:</label>
+                <select id="remove-select" required>
+                    <option value="">Select an assignment...</option>
+                </select>
+            </div>
+            <button type="button" class="back-btn" onclick="showSection('main-menu')">Back</button>
+            <button type="button" class="submit-btn" onclick="removeAssignment()">Remove Assignment</button>
+        </div>
+
+        <!-- Backup & Restore Section -->
+        <div id="backup-restore" class="section">
+            <h2>Backup & Restore</h2>
+            
+            <div class="form-group">
+                <h3>Backup Data</h3>
+                <p>Download a backup of all your assignments:</p>
+                <button class="btn" onclick="downloadBackup()">Download Backup</button>
+            </div>
+
+            <div class="form-group">
+                <h3>Restore Data</h3>
+                <p>Upload a backup file to restore your assignments:</p>
+                <input type="file" id="backup-file" accept=".json" onchange="handleFileUpload(event)">
+            </div>
+
+            <div class="form-group">
+                <h3 style="color: #dc3545;">Clear All Data</h3>
+                <p style="color: #dc3545;">⚠️ This will permanently delete all assignments!</p>
+                <button class="btn" style="background: #dc3545;" onclick="clearAllData()">Clear All Data</button>
+            </div>
+            
+            <button type="button" class="back-btn" onclick="showSection('main-menu')">Back</button>
+        </div>
+    </div>
+
+    <script>
+        // Assignment class
+        class Assignment {
+            constructor(teacher, task, type, dueDate, repetitionType, time, importance, timeSpent = 0) {
+                this.teacher = teacher;
+                this.task = task;
+                this.type = type;
+                this.dueDate = dueDate; // JavaScript Date object
+                this.repetitionType = repetitionType;
+                this.time = time;
+                this.importance = importance;
+                this.timeSpent = timeSpent;
+            }
+        }
+
+        // Data Manager for browser storage (using in-memory storage for Claude.ai)
+        class DataManager {
+            constructor() {
+                this.assignments = [];
+                this.priorityChart = {
+                    1: "Very low priority",
+                    2: "Low priority", 
+                    3: "Medium priority",
+                    4: "High priority",
+                    5: "Very high priority"
+                };
+            }
+
+            // Read assignments from storage
+            async readAssignments() {
+                return [...this.assignments];
+            }
+
+            // Write assignments to storage
+            async writeAssignments(assignments) {
+                this.assignments = [...assignments];
+            }
+
+            // Add a single assignment
+            async addAssignment(assignment) {
+                this.assignments.push(assignment);
+            }
+
+            // Remove assignment by index
+            async removeAssignment(index) {
+                if (index >= 0 && index < this.assignments.length) {
+                    this.assignments.splice(index, 1);
+                    return true;
+                }
+                return false;
+            }
+
+            // Update assignment time spent
+            async updateTimeSpent(index, additionalTime) {
+                if (index >= 0 && index < this.assignments.length) {
+                    this.assignments[index].timeSpent += additionalTime;
+                    return true;
+                }
+                return false;
+            }
+
+            // Update entire assignment
+            async updateAssignment(index, updatedAssignment) {
+                if (index >= 0 && index < this.assignments.length) {
+                    this.assignments[index] = updatedAssignment;
+                    return true;
+                }
+                return false;
+            }
+
+            // Get assignment by index
+            async getAssignment(index) {
+                if (index >= 0 && index < this.assignments.length) {
+                    return this.assignments[index];
+                }
+                return null;
+            }
+
+            // Clear all assignments (utility method)
+            async clearAllAssignments() {
+                this.assignments = [];
+            }
+
+            // Export assignments as JSON for backup
+            exportAssignments() {
+                return JSON.stringify(this.assignments, null, 2);
+            }
+
+            // Import assignments from JSON
+            async importAssignments(jsonString) {
+                try {
+                    const parsed = JSON.parse(jsonString);
+                    this.assignments = parsed.map(a => ({
+                        ...a,
+                        dueDate: new Date(a.dueDate)
+                    }));
+                    return true;
+                } catch (error) {
+                    console.error('Error importing assignments:', error);
+                    return false;
+                }
+            }
+        }
+
+        // Global data manager instance
+        const dataManager = new DataManager();
+
+        // Utility function to convert form inputs to Date object
+        function convertToDate(dayOfWeek, month, day, year = 2025) {
+            const months = {
+                "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5,
+                "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11
+            };
+            
+            return new Date(year, months[month], day, 12, 0, 0);
+        }
+
+        // Show status message
+        function showStatus(message, isError = false) {
+            const statusElement = document.getElementById('status-message');
+            statusElement.textContent = message;
+            statusElement.className = `status-message ${isError ? 'status-error' : 'status-success'}`;
+            statusElement.style.display = 'block';
+            
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 3000);
+        }
+
+        // Show specific section
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Load data for specific sections
+            if (sectionId === 'view-assignments') {
+                loadAssignments();
+            } else if (sectionId === 'log-time') {
+                loadAssignmentSelect('assignment-select');
+            } else if (sectionId === 'remove-assignment') {
+                loadAssignmentSelect('remove-select');
+            } else if (sectionId === 'edit-assignment') {
+                loadAssignmentSelect('edit-select');
+            }
+        }
+
+        // Toggle date input based on assignment type
+        function toggleDateInput() {
+            const typeSelect = document.getElementById('type');
+            const dateGroup = document.getElementById('date-group');
+            
+            if (typeSelect.value === 'indefinite') {
+                dateGroup.style.display = 'none';
+            } else {
+                dateGroup.style.display = 'block';
+            }
+        }
+
+        // Toggle date input for edit form
+        function toggleEditDateInput() {
+            const typeSelect = document.getElementById('edit-type');
+            const dateGroup = document.getElementById('edit-date-group');
+            
+            if (typeSelect.value === 'indefinite') {
+                dateGroup.style.display = 'none';
+            } else {
+                dateGroup.style.display = 'block';
+            }
+        }
+
+        // Add assignment form handler
+        document.getElementById('add-assignment-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const teacher = formData.get('teacher');
+            const task = formData.get('task');
+            const type = formData.get('type');
+            const repetition = formData.get('repetition');
+            const time = parseInt(formData.get('time'));
+            const importance = parseInt(formData.get('importance'));
+            
+            let dueDate;
+            if (type === 'definite') {
+                const dayOfWeek = formData.get('dayOfWeek');
+                const month = formData.get('month');
+                const day = parseInt(formData.get('day'));
+                dueDate = convertToDate(dayOfWeek, month, day);
+            } else {
+                dueDate = convertToDate("Sun", "Jan", 1);
+            }
+            
+            const newAssignment = new Assignment(teacher, task, type, dueDate, repetition, time, importance, 0);
+            
+            try {
+                await dataManager.addAssignment(newAssignment);
+                showStatus('Assignment added successfully!');
+                this.reset();
+                showSection('main-menu');
+            } catch (error) {
+                showStatus('Error adding assignment: ' + error.message, true);
+            }
+        });
+
+        // Load assignments into select dropdown
+        async function loadAssignmentSelect(selectId) {
+            const select = document.getElementById(selectId);
+            const assignments = await dataManager.readAssignments();
+            
+            // Clear existing options except the first one
+            select.innerHTML = '<option value="">Select an assignment...</option>';
+            
+            assignments.forEach((assignment, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${assignment.teacher} - ${assignment.task}`;
+                select.appendChild(option);
+            });
+        }
+
+        // Load and display assignments
+        async function loadAssignments() {
+            const container = document.getElementById('assignments-container');
+            const loading = document.getElementById('assignments-loading');
+            
+            loading.style.display = 'block';
+            container.innerHTML = '';
+            
+            try {
+                const assignments = await dataManager.readAssignments();
+                
+                if (assignments.length === 0) {
+                    container.innerHTML = '<p>No assignments found. Add some assignments first!</p>';
+                } else {
+                    assignments.forEach((assignment, index) => {
+                        const card = createAssignmentCard(assignment, index);
+                        container.appendChild(card);
+                    });
+                }
+            } catch (error) {
+                container.innerHTML = '<p>Error loading assignments: ' + error.message + '</p>';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Create assignment card HTML
+        function createAssignmentCard(assignment, index) {
+            const card = document.createElement('div');
+            card.className = 'assignment-card';
+            
+            const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            
+            const dueDateString = assignment.type === 'definite' ? 
+                `${daysOfWeek[assignment.dueDate.getDay()]} ${months[assignment.dueDate.getMonth()]} ${assignment.dueDate.getDate()}` :
+                'No due date';
+            
+            card.innerHTML = `
+                <div class="assignment-header">
+                    <div class="assignment-title">${assignment.task}</div>
+                    <div class="priority-badge priority-${assignment.importance}">${dataManager.priorityChart[assignment.importance]}</div>
+                </div>
+                <div class="assignment-details">
+                    <strong>Teacher:</strong> ${assignment.teacher}<br>
+                    <strong>Type:</strong> ${assignment.type}<br>
+                    <strong>Due Date:</strong> ${dueDateString}<br>
+                    <strong>Repetition:</strong> ${assignment.repetitionType}<br>
+                    <strong>Estimated Time:</strong> ${assignment.time} minutes<br>
+                    <strong>Time Spent:</strong> ${assignment.timeSpent} minutes<br>
+                    <strong>Assignment #:</strong> ${index + 1}
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Plan day functionality
+        async function planDay() {
+            const availableTime = parseInt(document.getElementById('available-time').value);
+            const resultsDiv = document.getElementById('plan-results');
+            
+            if (!availableTime || availableTime <= 0) {
+                showStatus('Please enter a valid amount of available time', true);
+                return;
+            }
+            
+            const assignments = await dataManager.readAssignments();
+            
+            if (assignments.length === 0) {
+                showStatus('No assignments found. Add some assignments first!', true);
+                return;
+            }
+            
+            // Calculate days until due for each assignment
+            const currentDate = new Date();
+            const daysUntilDue = assignments.map(assignment => {
+                if (assignment.type === "definite") {
+                    const timeDiff = assignment.dueDate.getTime() - currentDate.getTime();
+                    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                    return Math.min(Math.max(daysDiff, 0), 7);
+                } else {
+                    return 7;
+                }
+            });
+            
+            // Adjust for daily and weekly assignments
+            for (let i = 0; i < assignments.length; i++) {
+                if (assignments[i].repetitionType === "daily") {
+                    daysUntilDue[i] = 2;
+                } else if (assignments[i].repetitionType === "weekly") {
+                    daysUntilDue[i] = 4; // Medium priority for weekly assignments
+                }
+            }
+            
+            // Calculate criticality scores
+            const criticalityScores = assignments.map((assignment, i) => {
+                let score = (100 - 10 * daysUntilDue[i]) * (assignment.time - assignment.timeSpent);
+                score += 20 * assignment.importance;
+                return Math.max(score, 0);
+            });
+            
+            let remainingTime = availableTime;
+            const workingAssignments = assignments.map(a => ({...a})); // Deep copy
+            const plannedAssignments = [];
+            
+            while (remainingTime > 0) {
+                // Find maximum criticality
+                let maxCriticality = 0;
+                let maxIndices = [];
+                
+                for (let i = 0; i < workingAssignments.length; i++) {
+                    if (workingAssignments[i].timeSpent >= workingAssignments[i].time) continue;
+                    
+                    if (criticalityScores[i] > maxCriticality) {
+                        maxCriticality = criticalityScores[i];
+                        maxIndices = [i];
+                    } else if (criticalityScores[i] === maxCriticality) {
+                        maxIndices.push(i);
+                    }
+                }
+                
+                if (maxIndices.length === 0) {
+                    // All assignments completed, find most important with earliest deadline
+                    let maxImportance = 0;
+                    let importantIndices = [];
+                    
+                    for (let i = 0; i < workingAssignments.length; i++) {
+                        if (workingAssignments[i].importance > maxImportance) {
+                            maxImportance = workingAssignments[i].importance;
+                            importantIndices = [i];
+                        } else if (workingAssignments[i].importance === maxImportance) {
+                            importantIndices.push(i);
+                        }
+                    }
+                    
+                    // Find earliest deadline among most important
+                    let earliestDays = Infinity;
+                    let earliestIndex = -1;
+                    for (const i of importantIndices) {
+                        if (daysUntilDue[i] < earliestDays) {
+                            earliestDays = daysUntilDue[i];
+                            earliestIndex = i;
+                        }
+                    }
+                    
+                    if (earliestIndex !== -1) {
+                        plannedAssignments.push({
+                            assignment: workingAssignments[earliestIndex],
+                            index: earliestIndex + 1,
+                            recommendedTime: remainingTime
+                        });
+                    }
+                    break;
+                }
+                
+                // Calculate total time needed for max criticality assignments
+                let totalTimeNeeded = 0;
+                for (const i of maxIndices) {
+                    totalTimeNeeded += workingAssignments[i].time - workingAssignments[i].timeSpent;
+                }
+                
+                if (totalTimeNeeded > remainingTime) {
+                    // Allocate time proportionally
+                    const increment = Math.floor(remainingTime / maxIndices.length);
+                    let extra = remainingTime - increment * maxIndices.length;
+                    
+                    for (const i of maxIndices) {
+                        const timeToAllocate = increment + (extra > 0 ? 1 : 0);
+                        if (extra > 0) extra--;
+                        
+                        plannedAssignments.push({
+                            assignment: workingAssignments[i],
+                            index: i + 1,
+                            recommendedTime: timeToAllocate
+                        });
+                        
+                        workingAssignments[i].timeSpent += timeToAllocate;
+                        remainingTime -= timeToAllocate;
+                    }
+                } else {
+                    // Allocate full time needed
+                    for (const i of maxIndices) {
+                        const timeNeeded = workingAssignments[i].time - workingAssignments[i].timeSpent;
+                        plannedAssignments.push({
+                            assignment: workingAssignments[i],
+                            index: i + 1,
+                            recommendedTime: timeNeeded
+                        });
+                        
+                        workingAssignments[i].timeSpent = workingAssignments[i].time;
+                        remainingTime -= timeNeeded;
+                    }
+                }
+            }
+            
+            // Display results
+            displayPlanResults(plannedAssignments);
+            resultsDiv.style.display = 'block';
+        }
+
+        // Display plan results
+        function displayPlanResults(plannedAssignments) {
+            const resultsDiv = document.getElementById('plan-results');
+            resultsDiv.innerHTML = '';
+            
+            if (plannedAssignments.length === 0) {
+                resultsDiv.innerHTML = '<p>No assignments to plan for today!</p>';
+                return;
+            }
+            
+            const title = document.createElement('h3');
+            title.textContent = 'Recommended Plan for Today:';
+            title.style.marginBottom = '20px';
+            resultsDiv.appendChild(title);
+            
+            plannedAssignments.forEach(item => {
+                const card = createPlanCard(item.assignment, item.index, item.recommendedTime);
+                resultsDiv.appendChild(card);
+            });
+            
+            const note = document.createElement('p');
+            note.textContent = 'Note: Remember to log your time spent after completing assignments!';
+            note.style.marginTop = '20px';
+            note.style.fontStyle = 'italic';
+            note.style.color = '#666';
+            resultsDiv.appendChild(note);
+        }
+
+        // Create plan card
+        function createPlanCard(assignment, index, recommendedTime) {
+            const card = document.createElement('div');
+            card.className = 'assignment-card';
+            
+            const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            
+            const dueDateString = assignment.type === 'definite' ? 
+                `${daysOfWeek[assignment.dueDate.getDay()]} ${months[assignment.dueDate.getMonth()]} ${assignment.dueDate.getDate()}` :
+                'No due date';
+            
+            card.innerHTML = `
+                <div class="assignment-header">
+                    <div class="assignment-title">Assignment ${index}: ${assignment.task}</div>
+                    <div class="priority-badge priority-${assignment.importance}">${dataManager.priorityChart[assignment.importance]}</div>
+                </div>
+                <div class="assignment-details">
+                    <strong>Teacher:</strong> ${assignment.teacher}<br>
+                    <strong>Type:</strong> ${assignment.type}<br>
+                    <strong>Due Date:</strong> ${dueDateString}<br>
+                    <strong>Repetition:</strong> ${assignment.repetitionType}<br>
+                    <strong>Estimated Length:</strong> ${assignment.time} minutes<br>
+                    ${assignment.repetitionType !== "daily" && assignment.repetitionType !== "weekly" ? `<strong>Time Spent:</strong> ${assignment.timeSpent} minutes<br>` : ''}
+                    <strong>Recommended Time:</strong> ${recommendedTime} minutes
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Load assignment for editing
+        async function loadAssignmentForEdit() {
+            const assignmentIndex = parseInt(document.getElementById('edit-select').value);
+            
+            if (isNaN(assignmentIndex) || assignmentIndex < 0) {
+                // Clear edit form if no assignment selected
+                clearEditForm();
+                return;
+            }
+            
+            const assignment = await dataManager.getAssignment(assignmentIndex);
+            
+            if (!assignment) {
+                showStatus('Invalid assignment selected', true);
+                clearEditForm();
+                return;
+            }
+            
+            // Populate edit form with assignment data
+            document.getElementById('edit-teacher').value = assignment.teacher;
+            document.getElementById('edit-task').value = assignment.task;
+            document.getElementById('edit-type').value = assignment.type;
+            document.getElementById('edit-repetition').value = assignment.repetitionType;
+            document.getElementById('edit-time').value = assignment.time;
+            document.getElementById('edit-importance').value = assignment.importance;
+            document.getElementById('edit-time-spent').value = assignment.timeSpent;
+            
+            // Handle date fields
+            if (assignment.type === 'definite') {
+                const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                
+                document.getElementById('edit-dayOfWeek').value = daysOfWeek[assignment.dueDate.getDay()];
+                document.getElementById('edit-month').value = months[assignment.dueDate.getMonth()];
+                document.getElementById('edit-day').value = assignment.dueDate.getDate();
+                
+                document.getElementById('edit-date-group').style.display = 'block';
+            } else {
+                document.getElementById('edit-date-group').style.display = 'none';
+            }
+            
+            // Show edit form
+            document.getElementById('edit-form-container').style.display = 'block';
+        }
+
+        // Clear edit form
+        function clearEditForm() {
+            document.getElementById('edit-assignment-form').reset();
+            document.getElementById('edit-form-container').style.display = 'none';
+        }
+
+        // Save edited assignment
+        async function saveEditedAssignment() {
+            const assignmentIndex = parseInt(document.getElementById('edit-select').value);
+            
+            if (isNaN(assignmentIndex) || assignmentIndex < 0) {
+                showStatus('Please select an assignment to edit', true);
+                return;
+            }
+            
+            const form = document.getElementById('edit-assignment-form');
+            const formData = new FormData(form);
+            
+            const teacher = formData.get('teacher');
+            const task = formData.get('task');
+            const type = formData.get('type');
+            const repetition = formData.get('repetition');
+            const time = parseInt(formData.get('time'));
+            const importance = parseInt(formData.get('importance'));
+            const timeSpent = parseInt(formData.get('timeSpent')) || 0;
+            
+            // Validation
+            if (!teacher || !task || !type || !repetition || !time || !importance) {
+                showStatus('Please fill in all required fields', true);
+                return;
+            }
+            
+            if (time <= 0 || importance < 1 || importance > 5) {
+                showStatus('Please enter valid values for time and importance', true);
+                return;
+            }
+            
+            let dueDate;
+            if (type === 'definite') {
+                const dayOfWeek = formData.get('dayOfWeek');
+                const month = formData.get('month');
+                const day = parseInt(formData.get('day'));
+                
+                if (!dayOfWeek || !month || !day) {
+                    showStatus('Please fill in all date fields for definite assignments', true);
+                    return;
+                }
+                
+                dueDate = convertToDate(dayOfWeek, month, day);
+            } else {
+                dueDate = convertToDate("Sun", "Jan", 1);
+            }
+            
+            const updatedAssignment = new Assignment(teacher, task, type, dueDate, repetition, time, importance, timeSpent);
+            
+            try {
+                await dataManager.updateAssignment(assignmentIndex, updatedAssignment);
+                showStatus('Assignment updated successfully!');
+                clearEditForm();
+                showSection('main-menu');
+            } catch (error) {
+                showStatus('Error updating assignment: ' + error.message, true);
+            }
+        }
+
+        // Cancel edit
+        function cancelEdit() {
+            clearEditForm();
+            document.getElementById('edit-select').value = '';
+        }
+
+        // Log time functionality
+        async function logTime() {
+            const assignmentIndex = parseInt(document.getElementById('assignment-select').value);
+            const timeSpent = parseInt(document.getElementById('time-spent').value);
+            
+            if (isNaN(assignmentIndex) || assignmentIndex < 0) {
+                showStatus('Please select an assignment', true);
+                return;
+            }
+            
+            if (!timeSpent || timeSpent <= 0) {
+                showStatus('Please enter a valid time amount', true);
+                return;
+            }
+            
+            const assignments = await dataManager.readAssignments();
+            
+            if (assignmentIndex >= assignments.length) {
+                showStatus('Invalid assignment selected', true);
+                return;
+            }
+            
+            if (assignments[assignmentIndex].repetitionType === "daily" || assignments[assignmentIndex].repetitionType === "weekly") {
+                showStatus(`Cannot log time for ${assignments[assignmentIndex].repetitionType} assignments`, true);
+                return;
+            }
+            
+            try {
+                await dataManager.updateTimeSpent(assignmentIndex, timeSpent);
+                showStatus('Time logged successfully!');
+                
+                // Reset form
+                document.getElementById('assignment-select').value = '';
+                document.getElementById('time-spent').value = '';
+                
+                showSection('main-menu');
+            } catch (error) {
+                showStatus('Error logging time: ' + error.message, true);
+            }
+        }
+
+        // Remove assignment functionality
+        async function removeAssignment() {
+            const assignmentIndex = parseInt(document.getElementById('remove-select').value);
+            
+            if (isNaN(assignmentIndex) || assignmentIndex < 0) {
+                showStatus('Please select an assignment to remove', true);
+                return;
+            }
+            
+            const assignments = await dataManager.readAssignments();
+            
+            if (assignmentIndex >= assignments.length) {
+                showStatus('Invalid assignment selected', true);
+                return;
+            }
+            
+            try {
+                await dataManager.removeAssignment(assignmentIndex);
+                showStatus('Assignment removed successfully!');
+                
+                // Reset form
+                document.getElementById('remove-select').value = '';
+                
+                showSection('main-menu');
+            } catch (error) {
+                showStatus('Error removing assignment: ' + error.message, true);
+            }
+        }
+
+        // Backup and restore functionality
+        function downloadBackup() {
+            const assignments = dataManager.exportAssignments();
+            const blob = new Blob([assignments], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `time_manager_backup_${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showStatus('Backup downloaded successfully!');
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const success = await dataManager.importAssignments(e.target.result);
+                    if (success) {
+                        showStatus('Assignments restored successfully!');
+                        showSection('main-menu');
+                    } else {
+                        showStatus('Error restoring assignments. Please check the file format.', true);
+                    }
+                } catch (error) {
+                    showStatus('Error reading backup file: ' + error.message, true);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all assignments? This action cannot be undone.')) {
+                dataManager.clearAllAssignments();
+                showStatus('All assignments cleared successfully!');
+                showSection('main-menu');
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default values
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentDay = today.getDate();
+            const currentDayOfWeek = today.getDay();
+            
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            
+            document.getElementById('month').value = monthNames[currentMonth];
+            document.getElementById('day').value = currentDay;
+            document.getElementById('dayOfWeek').value = dayNames[currentDayOfWeek];
+            
+            // Show main menu by default
+            showSection('main-menu');
+        });
+    </script>
+</body>
+</html>
