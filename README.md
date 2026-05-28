@@ -10,7 +10,7 @@ data is stored locally on the browser.
 
 > ***To download, go to "planner_v2.0.html" on Github and select "Download raw file" on the top right. The HTML 
 file should download to your device. Open it using your desired web browser. Alternatively, you can download the
-> entire planner through Github.***
+> entire zip file through Github and unzip the entire folder.***
 
 There are 7 options within the website; follow on-screen instructions and enter appropriate 
 information. The program was not designed to automatically remove assignments past due date, and 
