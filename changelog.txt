@@ -1,0 +1,24 @@
+CHANGELOG:
+-----------------------------
+
+5/24/2026:
+Modified original version
+Added importing/exporting assignments
+Added assignment tags
+
+5/25/2026:
+Added assignment previews when removing assignments or logging time
+Added saving of the color of tags in assignment csv files 
+ -  Older assignment CSV's still work
+Exporting assignments now clear the fields when adding assignments
+Added no local data storage warning banner
+Edited README
+
+5/26/2026:
+Added local data storage of assignments
+Removed warning banner
+Added exporting of existing assignments
+
+5/27/2026:
+Fixed some small bugs
+Renamed the project
