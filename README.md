@@ -1,4 +1,4 @@
-# Dance-Planner
+# Turtle, the Consistency Manager
 
 This is a planner, specifically created for the purpose of managing dance homework/assigned practice.
 
@@ -8,8 +8,9 @@ Download and open "planner_v2.0.html" locally using a web browser to access the 
 HTML file, and is supported by most web browsers. Functionality on mobile devices is un-tested. All 
 data is stored locally on the browser.
 
-> ***To download, go to "index.html" on Github and select "Download raw file" on the top right. The HTML 
-file should download to your device. Open it using your desired web browser.***
+> ***To download, go to "planner_v2.0.html" on Github and select "Download raw file" on the top right. The HTML 
+file should download to your device. Open it using your desired web browser. Alternatively, you can download the
+> entire planner through Github.***
 
 There are 7 options within the website; follow on-screen instructions and enter appropriate 
 information. The program was not designed to automatically remove assignments past due date, and 
