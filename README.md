@@ -4,9 +4,9 @@ This is a planner, specifically created for the purpose of managing dance homewo
 
 -----------------------------------------------------------------------------------------------------
 
-Download and open "index.html" locally using a web browser to access the program. "index.html" is an
+Download and open "planner_v2.0.html" locally using a web browser to access the program. "planner_v2.0" is an
 HTML file, and is supported by most web browsers. Functionality on mobile devices is un-tested. All 
-data is stored locally.
+data is stored locally on the browser.
 
 > ***To download, go to "index.html" on Github and select "Download raw file" on the top right. The HTML 
 file should download to your device. Open it using your desired web browser.***
@@ -20,7 +20,9 @@ your day does not log time. Do not log time for daily or weekly assignments.
 
 Please enter values in whole minutes. 
 
-Rename the "index.html" file as necessary.  
+Rename the file as necessary.  
+
+Old files are included within the "Archived" folder.
 
   
 
