@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Turtle, the Consistency Manager</title>
+    <title>Time Manager</title>
     <style>
         * {
             margin: 0;
@@ -12,7 +12,7 @@
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: url('https://iopwiki.com/images/thumb/7/7a/202408_HK-416_c_crop.png/300px-202408_HK-416_c_crop.png') center/cover no-repeat fixed;
+			<!-- background: url('https://iopwiki.com/images/thumb/7/7a/202408_HK-416_c_crop.png/300px-202408_HK-416_c_crop.png') center/cover no-repeat fixed; -->
             background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
@@ -38,7 +38,7 @@
             text-align: center;
             color: #333;
             margin-bottom: 30px;
-            font-size: 3em;
+            font-size: 2.5em;
             background: linear-gradient(45deg, #667eea, #764ba2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -493,7 +493,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Turtle</h1>
+        <h1>Time Manager</h1>
 
         <div id="status-message" class="status-message"></div>
 
@@ -844,23 +844,25 @@
         //  Assignment class
         // ─────────────────────────────────────────────
         class Assignment {
-            constructor(teacher, task, type, dueDate, repetitionType, time, importance, timeSpent = 0, tagId = null) {
-                this.teacher       = teacher;
-                this.task          = task;
-                this.type          = type;
-                this.dueDate       = dueDate;
-                this.repetitionType = repetitionType;
-                this.time          = time;
-                this.importance    = importance;
-                this.timeSpent     = timeSpent;
-                this.tagId         = tagId; // null or tag id string
+            constructor(teacher, task, type, dueDate, repetitionType, time, importance, timeSpent = 0, tagId = null, weeklyTimeSpent = 0) {
+                this.teacher          = teacher;
+                this.task             = task;
+                this.type             = type;
+                this.dueDate          = dueDate;
+                this.repetitionType   = repetitionType;
+                this.time             = time;
+                this.importance       = importance;
+                this.timeSpent        = timeSpent;
+                this.tagId            = tagId;
+                this.weeklyTimeSpent  = weeklyTimeSpent; // resets every Monday
             }
         }
 
         // ─────────────────────────────────────────────
         //  Data Manager  (localStorage-backed)
         // ─────────────────────────────────────────────
-        const LS_KEY = 'time_manager_data';
+        const LS_KEY      = 'time_manager_data';
+        const LS_WEEK_KEY = 'time_manager_week'; // stores ISO date string of the last Monday reset
 
         class DataManager {
             constructor() {
@@ -872,6 +874,7 @@
                     5: "Very high priority"
                 };
                 this._load();
+                this._resetWeeklyIfNeeded();
             }
 
             // ── Persistence ──────────────────────────
@@ -881,7 +884,8 @@
                     if (raw) {
                         const parsed = JSON.parse(raw);
                         this.assignments = (parsed.assignments || []).map(a => ({
-                            ...a, dueDate: new Date(a.dueDate), tagId: a.tagId || null
+                            ...a, dueDate: new Date(a.dueDate), tagId: a.tagId || null,
+                            weeklyTimeSpent: a.weeklyTimeSpent ?? 0
                         }));
                         this.tags = parsed.tags || [];
                     } else {
@@ -892,6 +896,32 @@
                     console.error('Failed to load from localStorage:', e);
                     this.assignments = [];
                     this.tags = [];
+                }
+            }
+
+            // Returns the ISO date string (YYYY-MM-DD) of the Monday on or before a given date
+            _getMondayKey(date) {
+                const d = new Date(date);
+                const day = d.getDay(); // 0=Sun … 6=Sat
+                const diff = (day === 0) ? -6 : 1 - day; // days back to Monday
+                d.setDate(d.getDate() + diff);
+                return d.toISOString().slice(0, 10);
+            }
+
+            _resetWeeklyIfNeeded() {
+                const thisMondayKey  = this._getMondayKey(new Date());
+                const lastResetKey   = localStorage.getItem(LS_WEEK_KEY) || '';
+                if (lastResetKey !== thisMondayKey) {
+                    // New week — reset weeklyTimeSpent on all weekly assignments
+                    let changed = false;
+                    this.assignments.forEach(a => {
+                        if (a.repetitionType === 'weekly' && a.weeklyTimeSpent > 0) {
+                            a.weeklyTimeSpent = 0;
+                            changed = true;
+                        }
+                    });
+                    if (changed) this._save();
+                    localStorage.setItem(LS_WEEK_KEY, thisMondayKey);
                 }
             }
 
@@ -940,6 +970,14 @@
                 }
                 return false;
             }
+            async updateWeeklyTimeSpent(i, t) {
+                if (i >= 0 && i < this.assignments.length) {
+                    this.assignments[i].weeklyTimeSpent = (this.assignments[i].weeklyTimeSpent ?? 0) + t;
+                    this._save();
+                    return true;
+                }
+                return false;
+            }
             async updateAssignment(i, a) {
                 if (i >= 0 && i < this.assignments.length) {
                     this.assignments[i] = a;
@@ -965,9 +1003,9 @@
                 try {
                     const parsed = JSON.parse(jsonString);
                     if (Array.isArray(parsed)) {
-                        this.assignments = parsed.map(a => ({ ...a, dueDate: new Date(a.dueDate), tagId: a.tagId || null }));
+                        this.assignments = parsed.map(a => ({ ...a, dueDate: new Date(a.dueDate), tagId: a.tagId || null, weeklyTimeSpent: a.weeklyTimeSpent ?? 0 }));
                     } else {
-                        this.assignments = (parsed.assignments || []).map(a => ({ ...a, dueDate: new Date(a.dueDate), tagId: a.tagId || null }));
+                        this.assignments = (parsed.assignments || []).map(a => ({ ...a, dueDate: new Date(a.dueDate), tagId: a.tagId || null, weeklyTimeSpent: a.weeklyTimeSpent ?? 0 }));
                         this.tags = parsed.tags || [];
                     }
                     this._save();
@@ -1254,7 +1292,10 @@
                     <strong>Due Date:</strong> ${dueDateString}<br>
                     <strong>Repetition:</strong> ${assignment.repetitionType}<br>
                     <strong>Estimated Time:</strong> ${assignment.time} minutes<br>
-                    <strong>Time Spent:</strong> ${assignment.timeSpent} minutes<br>
+                    ${assignment.repetitionType === 'weekly'
+                        ? `<strong>Time Spent This Week:</strong> ${assignment.weeklyTimeSpent ?? 0} / ${assignment.time} minutes<br>`
+                        : `<strong>Time Spent:</strong> ${assignment.timeSpent} minutes<br>`
+                    }
                     <strong>Assignment #:</strong> ${index + 1}
                 </div>
                 <div class="tag-display-row">${tagDisplayHtml(assignment.tagId)}</div>`;
@@ -1295,16 +1336,29 @@
                 else if (assignments[i].repetitionType === "weekly") daysUntilDue[i] = 4;
             }
 
+            // For weekly assignments, use weeklyTimeSpent as the "progress" this week
+            // so the planner treats them as done once the weekly quota is filled.
+            const effectiveTimeSpent = assignments.map(a =>
+                a.repetitionType === 'weekly' ? (a.weeklyTimeSpent ?? 0) : a.timeSpent
+            );
+
+            const DAILY_BONUS = 200; // flat bonus added to daily assignment criticality
+
             const criticalityScores = assignments.map((a, i) => {
-                let score = (100 - 10 * daysUntilDue[i]) * (a.time - a.timeSpent);
+                const spent = effectiveTimeSpent[i];
+                let score = (100 - 10 * daysUntilDue[i]) * (a.time - spent);
                 score += 20 * a.importance;
+                if (a.repetitionType === 'daily') score += DAILY_BONUS;
                 return Math.max(score, 0);
             });
 
             let remainingTime = availableTime;
-            const working     = assignments.map(a => ({...a}));
-            // Snapshot the real logged time BEFORE the planning loop mutates working copies
-            const realTimeSpent = assignments.map(a => a.timeSpent);
+            // Working copies use effectiveTimeSpent so the loop respects weekly progress
+            const working = assignments.map((a, i) => ({ ...a, timeSpent: effectiveTimeSpent[i] }));
+            // Snapshot real values for display
+            const realTimeSpent = assignments.map((a, i) =>
+                a.repetitionType === 'weekly' ? (a.weeklyTimeSpent ?? 0) : a.timeSpent
+            );
             const planned     = [];
 
             while (remainingTime > 0) {
@@ -1371,7 +1425,11 @@
             const card = document.createElement('div');
             card.className = 'assignment-card';
             const dueDateString = formatDueDate(assignment);
-            const showTimeSpent = assignment.repetitionType !== "daily" && assignment.repetitionType !== "weekly";
+            const isDaily  = assignment.repetitionType === "daily";
+            const isWeekly = assignment.repetitionType === "weekly";
+            const timeSpentLine = isDaily  ? '' :
+                                  isWeekly ? `<strong>Time Spent This Week:</strong> ${realTimeSpent} / ${assignment.time} minutes<br>` :
+                                             `<strong>Time Spent:</strong> ${realTimeSpent} minutes<br>`;
             card.innerHTML = `
                 <div class="assignment-header">
                     <div class="assignment-title">Assignment ${index}: ${escHtml(assignment.task)}</div>
@@ -1383,7 +1441,7 @@
                     <strong>Due Date:</strong> ${dueDateString}<br>
                     <strong>Repetition:</strong> ${assignment.repetitionType}<br>
                     <strong>Estimated Length:</strong> ${assignment.time} minutes<br>
-                    ${showTimeSpent ? `<strong>Time Spent:</strong> ${realTimeSpent} minutes<br>` : ''}
+                    ${timeSpentLine}
                 </div>
                 <div style="margin-top:12px;padding:10px 14px;background:linear-gradient(45deg,#667eea,#764ba2);border-radius:8px;color:white;text-align:center;">
                     <span style="font-size:13px;font-weight:600;opacity:0.85;display:block;margin-bottom:2px;">Recommended Time</span>
@@ -1521,10 +1579,14 @@
             if (idx >= assignments.length)   { showStatus('Invalid assignment selected', true); return; }
 
             const rep = assignments[idx].repetitionType;
-            if (rep === "daily" || rep === "weekly") { showStatus(`Cannot log time for ${rep} assignments`, true); return; }
+            if (rep === "daily") { showStatus(`Cannot log time for daily assignments`, true); return; }
 
             try {
-                await dataManager.updateTimeSpent(idx, time);
+                if (rep === "weekly") {
+                    await dataManager.updateWeeklyTimeSpent(idx, time);
+                } else {
+                    await dataManager.updateTimeSpent(idx, time);
+                }
                 showStatus('Time logged successfully!');
                 document.getElementById('assignment-select').value = '';
                 document.getElementById('time-spent').value = '';
@@ -1616,6 +1678,7 @@
             if (confirm('Are you sure you want to clear all assignments and tags? This action cannot be undone.')) {
                 dataManager.clearAllAssignments();
                 localStorage.removeItem(LS_KEY);
+                localStorage.removeItem(LS_WEEK_KEY);
                 addFormSelectedTagId  = null;
                 editFormSelectedTagId = null;
                 viewFilterTagId       = 'ALL';
