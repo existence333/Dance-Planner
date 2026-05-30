@@ -22,3 +22,7 @@ Added exporting of existing assignments
 5/27/2026:
 Fixed some small bugs
 Renamed the project
+
+5/29/2026:
+Added logging time for weekly assignments (with automatic renewal)
+Reworked plan generation formula
