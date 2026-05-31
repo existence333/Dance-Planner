@@ -4,11 +4,11 @@ This is a planner, specifically created for the purpose of managing dance homewo
 
 -----------------------------------------------------------------------------------------------------
 
-Download and open "planner_v2.0.html" locally using a web browser to access the program. "planner_v2.0" is an
+Download and open the planner locally using a web browser to access the program. The program is an
 HTML file, and is supported by most web browsers. Functionality on mobile devices is un-tested. All 
 data is stored locally on the browser.
 
-> ***To download, go to "planner_v2.0.html" on Github and select "Download raw file" on the top right. The HTML 
+> ***To download, go to the planner file on Github and select "Download raw file" on the top right. The HTML 
 file should download to your device. Open it using your desired web browser. Alternatively, you can download the
 > entire zip file through Github and unzip the entire folder.***
 
@@ -17,7 +17,7 @@ information. The program was not designed to automatically remove assignments pa
 any assignments past due may encounter unexpected errors. 
 
 Logging time is necessary for the program to determine the relative importance of tasks. Planning 
-your day does not log time. Do not log time for daily or weekly assignments. 
+your day does not log time. Do not log time for daily assignments. The time spent on weekly assignments resets every week. 
 
 Please enter values in whole minutes. 
 
